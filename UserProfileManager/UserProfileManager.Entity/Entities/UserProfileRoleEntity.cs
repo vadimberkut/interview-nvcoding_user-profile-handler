@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
+using UserProfileManager.Entity.Enums;
 
 namespace UserProfileManager.Entity.Entities
 {
@@ -12,6 +13,8 @@ namespace UserProfileManager.Entity.Entities
         [Required]
         [MaxLength(200)]
         public string Name { get; set; }
+
+        public RoleType Type { get; set; }
 
         // One to Many
         public ICollection<UserProfileEntity> UserProfiles { get; set; }

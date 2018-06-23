@@ -9,6 +9,8 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.1.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.1.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="2.1.0" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.0.2" />
+    <PackageReference Include="MimeTypeMap.Core" Version="1.0.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -18,6 +20,10 @@
   <ItemGroup>
     <ProjectReference Include="..\UserProfileManager.Data\UserProfileManager.Data.csproj" />
     <ProjectReference Include="..\UserProfileManager.Entity\UserProfileManager.Entity.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Filters\" />
   </ItemGroup>
 
 </Project>

@@ -8,11 +8,14 @@ namespace UserProfileManager.Data.Repositories
 {
     public interface IUserProfileRepository
     {
-        IEnumerable<UserProfileEntity> GetAll(UserProfilesRequestDto data);
+        PaginatedDataResponseDto<List<UserProfileEntity>> GetAll(UserProfilesRequestDto data);
         UserProfileEntity Get(Guid id);
-        UserProfileEntity Create(UserProfileEntity data);
-        UserProfileEntity Update(UserProfileEntity data);
-        UserProfileEntity UpdateRole();
+        UserProfileEntity Create(UserProfileCreateOrUpdateDto data);
+        UserProfileEntity Update(UserProfileCreateOrUpdateDto data);
+        UserProfileRoleEntity UpdateRole(UpdateUserProfileRoleDto data);
+        UserProfileSettingsEntity UpdateSettings(UserProfileSettingsEntity data);
         //UserProfileEntity ToggleUserEnabled();
+
+        IEnumerable<UserProfileRoleEntity> GetAllRoles();
     }
 }

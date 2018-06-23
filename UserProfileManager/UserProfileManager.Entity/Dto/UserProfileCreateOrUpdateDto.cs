@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.ComponentModel.DataAnnotations;
+using System.Text;
 using UserProfileManager.Entity.ValidationAttributes;
 
-namespace UserProfileManager.Entity.Entities
+namespace UserProfileManager.Entity.Dto
 {
-    public class UserProfileEntity : ITrackableEntity
+    public class UserProfileCreateOrUpdateDto
     {
         public Guid Id { get; set; }
 
@@ -27,15 +27,6 @@ namespace UserProfileManager.Entity.Entities
 
         public string ImageUrl { get; set; }
 
-
-        public DateTime CreatedOnUtc { get; set; }
-        public DateTime UpdatedOnUtc { get; set; }
-
-        // Role
-        public Guid RoleId { get; set; }
-        public UserProfileRoleEntity Role { get; set; }
-
-        // Settings
-        public UserProfileSettingsEntity Settings { get; set; }
+        public string ImageBase64 { get; set; }
     }
 }

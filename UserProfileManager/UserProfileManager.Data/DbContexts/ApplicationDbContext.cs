@@ -21,8 +21,21 @@ namespace UserProfileManager.Data.DbContexts
         {
             base.OnModelCreating(builder);
 
+            const string MSSQL_TIMESTAMP_TYPE_NAME = "datetime";
+            const string MSSQL_TIMESTAMP_UTC_GENERATE_COMMAND = "getutcdate()";
+
             builder.Entity<UserProfileEntity>()
                 .HasKey(u => u.Id);
+            builder.Entity<UserProfileEntity>()
+                .Property(u => u.CreatedOnUtc)
+                .HasColumnType(MSSQL_TIMESTAMP_TYPE_NAME)
+                .ValueGeneratedOnAdd()
+                .HasDefaultValueSql(MSSQL_TIMESTAMP_UTC_GENERATE_COMMAND);
+            builder.Entity<UserProfileEntity>()
+                .Property(u => u.UpdatedOnUtc)
+                .HasColumnType(MSSQL_TIMESTAMP_TYPE_NAME)
+                .ValueGeneratedOnAddOrUpdate()
+                .HasDefaultValueSql(MSSQL_TIMESTAMP_UTC_GENERATE_COMMAND);
             builder.Entity<UserProfileEntity>()
                 .HasOne(u => u.Role)
                 .WithMany(r => r.UserProfiles)

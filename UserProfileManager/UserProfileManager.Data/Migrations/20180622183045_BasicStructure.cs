@@ -12,7 +12,8 @@ namespace UserProfileManager.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
-                    Name = table.Column<string>(maxLength: 200, nullable: false)
+                    Name = table.Column<string>(maxLength: 200, nullable: false),
+                    Type = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {

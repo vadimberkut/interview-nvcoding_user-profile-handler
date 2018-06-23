@@ -3,25 +3,10 @@
         <h3 class="title">User roles</h3>
         <div class="user-roles">
             <div class="input-group radio-group">
-                <label>
-                    <input type="radio" name="userrole" value="1" />
+                <label v-for="(role, index) in shared.roles" v-bind:key="`role_${index}`">
+                    <input v-model="private.roleId" v-bind:value="role.id" v-on:change="onRoleChange" type="radio" name="userrole" />
                     <span class="radio-check"></span>
-                    User
-                </label>
-                <label>
-                    <input type="radio" name="userrole" value="2" />
-                    <span class="radio-check"></span>
-                    User
-                </label>
-                <label>
-                    <input type="radio" name="userrole" value="3" />
-                    <span class="radio-check"></span>
-                    User
-                </label>
-                <label>
-                    <input type="radio" name="userrole" value="4" />
-                    <span class="radio-check"></span>
-                    User
+                    {{ role.name }}
                 </label>
             </div>
         </div>
@@ -29,9 +14,38 @@
 </template>
 
 <script>
-export default {
-    name: 'Edit',
+import _ from 'lodash';
+import store from '../store';
 
+export default {
+    name: 'UserRoleEdit',
+    data: function() {
+        return {
+            shared: store.state,
+            private: {
+                roleId: store.state.editableUserProfile.roleId
+            }
+        };
+    },
+    created: function() {
+        let self = this;
+
+        this.updateRole = _.debounce(function() {
+            store.actions.updateRole({
+                userProfileId: store.state.editableUserProfile.id,
+                userProfileRoleId: self.private.roleId
+            }).then(() => {
+            }).catch(err => {
+                // Revert vm to match the store
+                self.private.roleId = store.state.editableUserProfile.roleId
+            });
+        }, 500);
+    },
+    methods: {
+        onRoleChange: function(e) {
+            this.updateRole();
+        }
+    }
 }
 </script>
 

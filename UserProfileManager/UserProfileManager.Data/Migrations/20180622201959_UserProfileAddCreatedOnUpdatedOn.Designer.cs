@@ -10,8 +10,8 @@ using UserProfileManager.Data.DbContexts;
 namespace UserProfileManager.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20180618174019_BasicStructure")]
-    partial class BasicStructure
+    [Migration("20180622201959_UserProfileAddCreatedOnUpdatedOn")]
+    partial class UserProfileAddCreatedOnUpdatedOn
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -25,6 +25,11 @@ namespace UserProfileManager.Data.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
+
+                    b.Property<DateTime>("CreatedOnUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime")
+                        .HasDefaultValueSql("getutcdate()");
 
                     b.Property<string>("Email")
                         .IsRequired();
@@ -43,6 +48,11 @@ namespace UserProfileManager.Data.Migrations
                     b.Property<string>("SkypeLogin")
                         .HasMaxLength(200);
 
+                    b.Property<DateTime>("UpdatedOnUtc")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("datetime")
+                        .HasDefaultValueSql("getutcdate()");
+
                     b.HasKey("Id");
 
                     b.HasIndex("RoleId");
@@ -58,6 +68,8 @@ namespace UserProfileManager.Data.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200);
+
+                    b.Property<int>("Type");
 
                     b.HasKey("Id");
 

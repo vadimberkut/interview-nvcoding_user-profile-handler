@@ -11,6 +11,11 @@ using UserProfileManager.Data.DbContexts;
 using UserProfileManager.Data.Repositories;
 using UserProfileManager.Data.Repositories.Base;
 using Newtonsoft.Json;
+using UserProfileManager.Filters;
+using UserProfileManager.Entity.Entities;
+using UserProfileManager.Entity.Enums;
+using UserProfileManager.Data.Extensions;
+using System.Data.SqlClient;
 
 namespace UserProfileManager
 {
@@ -57,7 +62,8 @@ namespace UserProfileManager
             // Mvc
             services.AddMvc(options => {
                 // Regiter custom filters
-                //options.Filters.Add(typeof());
+                options.Filters.Add(typeof(ValidateActionInputFilterAttribute));
+                options.Filters.Add(typeof(CustomExceptionFilterAttribute));
             })
             .AddJsonOptions(options => {
                 // Config serialization
@@ -69,10 +75,10 @@ namespace UserProfileManager
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         { 
-            this.InitializeDatabase(app, env);
-
             if (env.IsDevelopment())
             {
+                this.InitializeDatabase(app, env);
+
                 app.UseBrowserLink();
                 app.UseDeveloperExceptionPage();
                 app.UseDatabaseErrorPage();
@@ -115,6 +121,50 @@ namespace UserProfileManager
 
                 // Ensure DB is created (do not apply migrations if exists)
                 // appDbContext.Database.EnsureCreated();
+
+                // appDbContext.Database.Migrate();
+
+                if (!appDbContext.IsAllMigrationsApplied())
+                {
+                    appDbContext.Database.Migrate();
+                }
+
+                try
+                {
+                    // Seed predefined Roles
+                    List<UserProfileRoleEntity> roles = new List<UserProfileRoleEntity>
+                {
+                    new UserProfileRoleEntity()
+                    {
+                        Name = RoleType.User.ToString(),
+                        Type = RoleType.User
+                    },
+                    new UserProfileRoleEntity()
+                    {
+                        Name = RoleType.Manager.ToString(),
+                        Type = RoleType.Manager
+                    },
+                    new UserProfileRoleEntity()
+                    {
+                        Name = RoleType.Admin.ToString(),
+                        Type = RoleType.Admin
+                    },
+                    new UserProfileRoleEntity()
+                    {
+                        Name = RoleType.Support.ToString(),
+                        Type = RoleType.Support
+                    }
+                };
+
+                    var existing = appDbContext.UserProfileRoles.ToList();
+                    var shouldBeCreated = roles.Where(x => !existing.Any(y => y.Type == x.Type));
+                    appDbContext.UserProfileRoles.AddRange(shouldBeCreated);
+                    appDbContext.SaveChanges();
+                }
+                catch(SqlException ex)
+                {
+                    // Ignore - maybe migrations haven't been applied yet
+                }
             }
         }
     }

@@ -6,34 +6,61 @@
     </router-link>
     <div class="search-box">
         <i class="fas fa-search search-icon"></i>
-        <input type="text" class="search-input">
+        <input v-on:keyup="searchTextChange" type="text" class="search-input">
     </div>
     <div class="filters">
-        <div class="filter-item filter-item--active">Enabled</div>
-        <div class="filter-item">Disabled</div>
+        <div v-bind:class="{ 'filter-item--active': userProfilesRequestParams.enabled }" v-on:click="enabledClick(true, $event)" class="filter-item">Enabled</div>
+        <div v-bind:class="{ 'filter-item--active': !userProfilesRequestParams.enabled }" v-on:click="enabledClick(false, $event)" class="filter-item">Disabled</div>
     </div>
-    <div class="user-list">
-        <div class="user-item">
-            <router-link to="/user/edit/1">
-                <div class="user-item__image">
-                    <img src="https://angular.io/assets/images/logos/angular/logo-nav@2x.png" />
-                </div>
-            </router-link>
-            <router-link to="/user/edit/1">
-                <div class="user-item__name">Test</div>
-            </router-link>
-        </div>
+    <div v-on:scroll="onUserListScroll" class="user-list">
+        <router-link v-for="(item, index) in userProfiles" v-bind:key="`userProfile_${index}`" class="user-item" v-bind:to="'/user/edit/profile/' + item.id">
+            <div class="user-item__image">
+                <img v-if="item.imageUrlAbsolute" v-bind:src="item.imageUrlAbsolute" />
+                <img v-else src="../assets/logo.png" />
+            </div>
+            <div class="user-item__name">{{ item.name }}</div>
+        </router-link>
     </div>
   </div>
   
 </template>
 
 <script>
+import _ from 'lodash';
+import store from '../store.js';
+
 export default {
   name: 'Menu',
   data () {
     return {
+        userProfilesRequestParams: store.state.userProfilesRequestParams,
+        userProfiles: store.state.userProfiles
     }
+  },
+  created: function() {
+  },
+  methods: {
+      enabledClick: function(enabled, e) {
+          store.state.userProfilesRequestParams.enabled = enabled;
+          store.actions.filterUserProfiles(store.state.userProfilesRequestParams);
+      },
+      searchTextChange: _.debounce(function(e) {
+          store.state.userProfilesRequestParams.searchText = e.target.value;
+          store.actions.filterUserProfiles(store.state.userProfilesRequestParams);
+      }, 500),
+      onUserListScroll: function(e) {
+          if(e.target.scrollTop + e.target.clientHeight >= e.target.scrollHeight) {
+            let nextPage = store.state.userProfilesRequestParams.page + 1;
+            if(nextPage >= store.state.userProfilesResponseParams.pages) {
+                return;
+            }
+            let params = {
+                ...store.state.userProfilesRequestParams,
+                page: nextPage
+            }
+            store.actions.getUserProfiles(params);
+          }
+      }
   }
 }
 </script>
@@ -42,10 +69,13 @@ export default {
 <style lang="scss" scoped>
     .menu {
       width: 25%;
-      min-width: 200px;
+      min-width: 250px;
       max-width: 300px;
       min-height: 100vh;
+      max-height: 100vh;
       background-color: #f1f1f1;
+      display: flex;
+      flex-direction: column;
 
       .add-user-btn {
         margin: 1rem;
@@ -100,6 +130,7 @@ export default {
 
       .user-list {
           margin: 1rem;
+          overflow-y: scroll;
 
           .user-item {
               width: 100%;
@@ -107,6 +138,10 @@ export default {
               align-items: center;
               cursor: pointer;
 
+              a {
+                display: flex;
+                align-items: center;
+              }
 
               &:not(:first-child) {
                   margin-top: 1rem;

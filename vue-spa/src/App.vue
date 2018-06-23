@@ -11,11 +11,27 @@
 import Menu from './components/Menu';
 import Content from './components/Content';
 
+import store from './store.js';
+
 export default {
   name: 'App',
   components: {
     Menu,
     Content
+  },
+  created: function() {
+    store.actions.getUserProfiles(store.state.userProfilesRequestParams).then((profiles) => {
+      // Navigate to first profile
+      if(profiles.length > 0) {
+        let first = profiles[0];
+        this.$router.push(`/user/edit/profile/${first.id}`);
+      }
+      else {
+        // Navigate create page
+        this.$router.push(`/user/create`);
+      }
+    });
+    store.actions.getRoles();
   }
 }
 </script>
@@ -34,6 +50,7 @@ export default {
   body {
     padding: 0;
     margin: 0;
+    overflow: hidden;
   }
 
   body *, body *::after, body *::before {
@@ -120,6 +137,7 @@ export default {
           height: 16px;
           border: 2px solid #8db0ff;
           margin-bottom: 0.5rem;
+          border-radius: 90%;
         }
         input[type="radio"]:checked ~ .radio-check {
           &:after {
@@ -131,6 +149,7 @@ export default {
             width: 10px;
             height: 10px;
             background-color: #8db0ff;
+            border-radius: 90%;
           }
         }
       }
@@ -159,16 +178,16 @@ export default {
         }
 
         input[type="checkbox"] ~ .on-text {
-          display: block;
+          display: none;
         }
         input[type="checkbox"] ~ .off-text {
-          display: none;
+          display: block;
         }
         input[type="checkbox"]:checked ~ .on-text {
-          display: none;
+          display: block;
         }
         input[type="checkbox"]:checked ~ .off-text {
-          display: block;
+          display: none;
         }
 
         input[type="checkbox"] ~ .toggle {
