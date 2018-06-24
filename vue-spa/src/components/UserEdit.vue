@@ -65,6 +65,11 @@ export default {
         else {
             store.actions.resetEditableUserProfile();
         }
+        console.log(to.params.id, this.shared.editableUserProfile.id, this.shared.editableUserProfile.name);
+        next();
+    },
+    beforeRouteLeave (to, from, next) {
+        console.log('beforeRouteLeave ', to, from);
         next();
     },
     data: function() {
@@ -105,6 +110,10 @@ export default {
             }
         }
 
+        this.validateName = function(name) {
+            let re = /^[a-zA-Z ]*$/;
+            return re.test(name);
+        }
         this.validateEmail = function(email) {
             var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
             return re.test(String(email).toLowerCase());
@@ -112,7 +121,7 @@ export default {
         this.validate = function() {
             let valid = true;
 
-            if(!this.shared.editableUserProfile.name || this.shared.editableUserProfile.name.length === 0) {
+            if(!this.shared.editableUserProfile.name || this.shared.editableUserProfile.name.length === 0 || !this.validateName(this.shared.editableUserProfile.name)) {
                 valid = false;
             }
             if(!this.shared.editableUserProfile.email || this.shared.editableUserProfile.email.length === 0 || !this.validateEmail(this.shared.editableUserProfile.email)) {
@@ -162,8 +171,7 @@ export default {
             else {
                 console.log('Creating a new user');
                 store.actions.createUserProfile(this.shared.editableUserProfile).then(profile => {
-                    store.actions.resetEditableUserProfile();
-                    store.actions.setEditableUserProfile(profile);
+                    // store.actions.setEditableUserProfile(profile);
                     // Navigate to edit page
                     this.$router.push(`/user/edit/profile/${profile.id}`);
                 });

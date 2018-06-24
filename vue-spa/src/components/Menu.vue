@@ -9,11 +9,16 @@
         <input v-on:keyup="searchTextChange" type="text" class="search-input">
     </div>
     <div class="filters">
-        <div v-bind:class="{ 'filter-item--active': userProfilesRequestParams.enabled }" v-on:click="enabledClick(true, $event)" class="filter-item">Enabled</div>
-        <div v-bind:class="{ 'filter-item--active': !userProfilesRequestParams.enabled }" v-on:click="enabledClick(false, $event)" class="filter-item">Disabled</div>
+        <div v-bind:class="{ 'filter-item--active': shared.userProfilesRequestParams.enabled }" v-on:click="enabledClick(true, $event)" class="filter-item">Enabled</div>
+        <div v-bind:class="{ 'filter-item--active': !shared.userProfilesRequestParams.enabled }" v-on:click="enabledClick(false, $event)" class="filter-item">Disabled</div>
     </div>
     <div v-on:scroll="onUserListScroll" class="user-list">
-        <router-link v-for="(item, index) in userProfiles" v-bind:key="`userProfile_${index}`" class="user-item" v-bind:to="'/user/edit/profile/' + item.id">
+        <router-link 
+            v-for="(item, index) in shared.userProfiles" 
+            v-bind:key="`userProfile_${index}`" 
+            class="user-item" 
+            v-bind:to="'/user/edit/profile/' + item.id"
+        >
             <div class="user-item__image">
                 <img v-if="item.imageUrlAbsolute" v-bind:src="item.imageUrlAbsolute" />
                 <img v-else src="../assets/logo.png" />
@@ -26,6 +31,7 @@
 </template>
 
 <script>
+           // v-bind:class="{ 'user-item--active': item.id === shared.editableUserProfile.id}" 
 import _ from 'lodash';
 import store from '../store.js';
 
@@ -33,29 +39,28 @@ export default {
   name: 'Menu',
   data () {
     return {
-        userProfilesRequestParams: store.state.userProfilesRequestParams,
-        userProfiles: store.state.userProfiles
+        shared: store.state,
     }
   },
   created: function() {
   },
   methods: {
       enabledClick: function(enabled, e) {
-          store.state.userProfilesRequestParams.enabled = enabled;
-          store.actions.filterUserProfiles(store.state.userProfilesRequestParams);
+          this.shared.userProfilesRequestParams.enabled = enabled;
+          store.actions.filterUserProfiles(this.shared.userProfilesRequestParams);
       },
       searchTextChange: _.debounce(function(e) {
-          store.state.userProfilesRequestParams.searchText = e.target.value;
-          store.actions.filterUserProfiles(store.state.userProfilesRequestParams);
+          this.shared.userProfilesRequestParams.searchText = e.target.value;
+          store.actions.filterUserProfiles(this.shared.userProfilesRequestParams);
       }, 500),
       onUserListScroll: function(e) {
           if(e.target.scrollTop + e.target.clientHeight >= e.target.scrollHeight) {
-            let nextPage = store.state.userProfilesRequestParams.page + 1;
-            if(nextPage >= store.state.userProfilesResponseParams.pages) {
+            let nextPage = this.shared.userProfilesRequestParams.page + 1;
+            if(nextPage >= this.shared.userProfilesResponseParams.pages) {
                 return;
             }
             let params = {
-                ...store.state.userProfilesRequestParams,
+                ...this.shared.userProfilesRequestParams,
                 page: nextPage
             }
             store.actions.getUserProfiles(params);
@@ -130,21 +135,31 @@ export default {
 
       .user-list {
           margin: 1rem;
-          overflow-y: scroll;
+          overflow-y: auto;
 
           .user-item {
               width: 100%;
               display: flex;
               align-items: center;
               cursor: pointer;
+              padding: 0.25rem 0.25rem;
 
               a {
                 display: flex;
                 align-items: center;
               }
 
+              &:hover {
+                background-color: #e0e0e0;
+              }
+
               &:not(:first-child) {
                   margin-top: 1rem;
+              }
+
+              &.user-item--active, &.router-link-active {
+                background-color: #585858;
+                color: #fff;
               }
 
               .user-item__image {

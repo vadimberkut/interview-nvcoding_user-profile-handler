@@ -23,7 +23,7 @@ namespace UserProfileManager.Entity.ValidationAttributes
             {
                 throw new ArgumentException("Can be applied only to string properties!");
             }
-            var regex = new Regex("[a-zA-Z ]*");
+            var regex = new Regex("^[a-zA-Z ]*$");
             if (regex.IsMatch(value.ToString()))
             {
                 return ValidationResult.Success;

@@ -38,7 +38,11 @@ function buildUrl(urlTemplate, endpoint, queryStringParams = {}, doEncodeURI = t
     return url;
 }
 
-let serverUrl = "http://localhost:33477";
+let serverUrl = window.location.origin;
+if(window.location.origin === "http://localhost:8080") {
+    // Dev
+    serverUrl = "http://localhost:33477";
+}
 let apiUrl = `${serverUrl}/api`;
 
 /**

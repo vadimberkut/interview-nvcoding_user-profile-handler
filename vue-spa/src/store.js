@@ -3,7 +3,7 @@ import API from './utils/API';
 
 let defaultUserProfilesRequestParams = {
     page: 0,
-    pageSize: 10,
+    pageSize: 25,
     searchText: null,
     enabled: true
 };
@@ -57,6 +57,7 @@ class Store {
         },
         /** Loads filtred item list and resetes current items */
         filterUserProfiles: (params) => {
+            params.page = 0;
             return API.userProfiles().getAll(params).then((response) => {
                 let { requestParams, responseParams, data } = response;
                 Object.assign(this.state.userProfilesRequestParams, requestParams);
@@ -133,8 +134,7 @@ class Store {
 
         /* Other */
         resetEditableUserProfile: () => {
-            // this.state.creatableUserProfile = _.cloneDeep(defaultUserProfile);
-            Object.assign(this.state.editableUserProfile, defaultUserProfile);
+            Object.assign(this.state.editableUserProfile, _.cloneDeep(defaultUserProfile));
         },
         setEditableUserProfile: (profile) => {
             this.actions.resetEditableUserProfile();

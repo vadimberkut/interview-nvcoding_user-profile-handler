@@ -133,33 +133,67 @@ namespace UserProfileManager
                 {
                     // Seed predefined Roles
                     List<UserProfileRoleEntity> roles = new List<UserProfileRoleEntity>
-                {
-                    new UserProfileRoleEntity()
                     {
-                        Name = RoleType.User.ToString(),
-                        Type = RoleType.User
-                    },
-                    new UserProfileRoleEntity()
-                    {
-                        Name = RoleType.Manager.ToString(),
-                        Type = RoleType.Manager
-                    },
-                    new UserProfileRoleEntity()
-                    {
-                        Name = RoleType.Admin.ToString(),
-                        Type = RoleType.Admin
-                    },
-                    new UserProfileRoleEntity()
-                    {
-                        Name = RoleType.Support.ToString(),
-                        Type = RoleType.Support
-                    }
-                };
+                        new UserProfileRoleEntity()
+                        {
+                            Name = RoleType.User.ToString(),
+                            Type = RoleType.User
+                        },
+                        new UserProfileRoleEntity()
+                        {
+                            Name = RoleType.Manager.ToString(),
+                            Type = RoleType.Manager
+                        },
+                        new UserProfileRoleEntity()
+                        {
+                            Name = RoleType.Admin.ToString(),
+                            Type = RoleType.Admin
+                        },
+                        new UserProfileRoleEntity()
+                        {
+                            Name = RoleType.Support.ToString(),
+                            Type = RoleType.Support
+                        }
+                    };
 
                     var existing = appDbContext.UserProfileRoles.ToList();
                     var shouldBeCreated = roles.Where(x => !existing.Any(y => y.Type == x.Type));
                     appDbContext.UserProfileRoles.AddRange(shouldBeCreated);
                     appDbContext.SaveChanges();
+
+                    // Seed Users
+                    if (!appDbContext.UserProfiles.Any())
+                    {
+                        Random random = new Random();
+                        Func<int, string> randomString = ((length) =>
+                        {
+                            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                            return new string(Enumerable.Repeat(chars, length)
+                              .Select(s => s[random.Next(s.Length)]).ToArray());
+                        });
+
+                        var role = roles.First();
+                        List<UserProfileEntity> users = new List<UserProfileEntity>();
+                        for (int i = 0; i <= 1000; i++)
+                        {
+                            users.Add(new UserProfileEntity
+                            {
+                                Name = $"Test User {randomString(3)}",
+                                Email = $"testuser{i+1}@test.com",
+                                SkypeLogin = $"skypetestuser{0}",
+                                Signature = $"signature {i+1}",
+                                ImageUrl = null,
+                                Role = role,
+                                Settings = new UserProfileSettingsEntity
+                                {
+                                    Enabled = i % 2 == 0 ? true : false
+                                }
+                            });
+                        }
+                        appDbContext.UserProfiles.AddRange(users);
+                        appDbContext.SaveChanges();
+                    }
+                   
                 }
                 catch(SqlException ex)
                 {
