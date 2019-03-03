@@ -49,6 +49,7 @@ module.exports = {
 
     // Paths
     assetsRoot: path.resolve(__dirname, '../dist'),
+    //assetsRoot: path.resolve('../../UserProfileManager/UserProfileManager/wwwroot'),
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
 
